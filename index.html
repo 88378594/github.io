@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>每天更新 | 最新热门赚钱项目</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .header h1 {
+            font-size: 24px;
+            margin: 0;
+            cursor: pointer; /* 使标题变成可点击 */
+        }
+        .item {
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .item img {
+            width: 100%;
+            cursor: pointer;
+        }
+        .item h2 {
+            margin: 10px;
+        }
+        .item .time {
+            margin: 10px;
+            color: gray;
+        }
+        .item .today {
+            color: red;
+        }
+        .pagination {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        .pagination button {
+            padding: 10px 15px;
+            border: none;
+            background: #007bff;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .pagination button:disabled {
+            background: gray;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container" id="app">
+    <div class="header">
+        <h1 onclick="goToHomePage()">每天更新 | 最新热门赚钱项目</h1>
+    </div>
+    <!-- 数据将通过 JavaScript 动态插入到这里 -->
+</div>
+<div class="pagination">
+    <button id="prevPage" disabled>上一页</button>
+    <button id="nextPage">下一页</button>
+</div>
+
+<script>
+    let currentPage = new URLSearchParams(window.location.search).get('page') || 1; // 从URL参数获取当前页
+    const apiUrl = 'https://08yl.com/api.php?page=';
+
+    async function fetchData(page) {
+        const response = await fetch(apiUrl + page);
+        const data = await response.json();
+        return data;
+    }
+
+    function formatTime(timestamp) {
+        const date = new Date(timestamp * 1000);
+        const today = new Date();
+        const isToday = date.getFullYear() === today.getFullYear() && 
+                        date.getMonth() === today.getMonth() && 
+                        date.getDate() === today.getDate();
+        return {
+            formatted: date.toLocaleString(),
+            isToday: isToday
+        };
+    }
+
+    function renderItems(items) {
+        const app = document.getElementById('app');
+        app.innerHTML = '';
+
+        const header = `
+            <div class="header">
+                <h1 onclick="goToHomePage()">每天更新 | 最新热门赚钱项目</h1>
+            </div>
+        `;
+        app.innerHTML += header;
+
+        items.forEach(item => {
+            const timeInfo = formatTime(item.time);
+            const timeClass = timeInfo.isToday ? 'time today' : 'time';
+            const itemHtml = `
+                <div class="item">
+                    <a href="${item.url}" target="_blank">
+                        <img src="${item.image}" alt="${item.title}">
+                    </a>
+                    <h2>${item.title}</h2>
+                    <div class="${timeClass}">${timeInfo.formatted}</div>
+                </div>
+            `;
+            app.innerHTML += itemHtml;
+        });
+    }
+
+    async function loadPage(page) {
+        const data = await fetchData(page);
+        renderItems(data.data);
+
+        document.getElementById('prevPage').disabled = page <= 1;
+        document.getElementById('nextPage').disabled = page >= data.total_pages;
+
+        // 更新URL参数
+        history.pushState(null, '', `?page=${page}`);
+        
+        // 滚动到页面顶部
+        window.scrollTo(0, 0);
+    }
+
+    function goToHomePage() {
+        // 跳转到首页（主域名）
+        window.location.href = '/'; // 替换为您的主域名
+    }
+
+    document.getElementById('prevPage').addEventListener('click', () => {
+        currentPage--;
+        loadPage(currentPage);
+    });
+
+    document.getElementById('nextPage').addEventListener('click', () => {
+        currentPage++;
+        loadPage(currentPage);
+    });
+
+    // 初始加载页面数据
+    loadPage(currentPage);
+</script>
+<script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
+<script>LA.init({id:"JRyHWoB1KzA1sNBb",ck:"JRyHWoB1KzA1sNBb"})</script>
+</body>
+</html>
